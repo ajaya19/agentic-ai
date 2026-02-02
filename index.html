@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Agentic AI Assistant</title>
+  
+</head>
+<body>
+
+<div class="container">
+  <div class="card neon-border">
+
+    <h1>🤖 Agentic AI Assistant</h1>
+    <p class="subtitle">Speak • Understand • Respond</p>
+
+    <button id="speakBtn" onclick="startListening()">🎤 Speak</button>
+
+<!-- TEXT INPUT MODE -->
+<div class="text-input">
+  <input 
+    type="text" 
+    id="textCommand" 
+    placeholder="Type a command... (eg: open youtube)">
+  <button onclick="sendTextCommand()">➤</button>
+</div>
+
+    <!-- SIRI CIRCLE -->
+    <div id="siri" class="siri hidden"></div>
+
+    <!-- VOICE WAVEFORM -->
+    <div id="waveform" class="wave hidden">
+      <span></span><span></span><span></span><span></span><span></span>
+    </div>
+
+    <!-- LISTENING DOTS -->
+    <div id="listening" class="listening hidden">
+      <span></span><span></span><span></span>
+      <p>Listening...</p>
+    </div>
+
+    <!-- CHAT AREA -->
+    <div class="chat-area">
+      <div id="userBox" class="chat user hidden">
+        <b>You</b>
+        <p id="userText"></p>
+      </div>
+
+      <div id="aiBox" class="chat ai hidden">
+        <b>Assistant</b>
+        <p id="aiText"></p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!--css-->
+<style>
+  body {
+  margin: 0;
+  height: 100vh;
+  font-family: 'Segoe UI', sans-serif;
+  background: radial-gradient(circle at top, #0f2027, #000);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #0f0e0e;
+}
+
+/* CARD */
+.container { width: 100%; max-width: 460px; }
+
+.card {
+  position: relative;
+  padding: 30px;
+  border-radius: 25px;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(15px);
+  text-align: center;
+}
+
+/* NEON BORDER ANIMATION */
+.neon-border::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: 25px;
+  background: linear-gradient(90deg, #00ffe0, #ff00ff, #00ffe0);
+  background-size: 300%;
+  animation: neonMove 6s linear infinite;
+  z-index: -1;
+}
+
+@keyframes neonMove {
+  0% { background-position: 0%; }
+  100% { background-position: 300%; }
+}
+
+.subtitle { opacity: 0.8; }
+
+/* BUTTON */
+button {
+  background: linear-gradient(45deg, #010d0cdb, hwb(200 4% 94%));
+  border: none;
+  padding: 14px 34px;
+  border-radius: 30px;
+  font-size: 16px;
+  cursor: pointer;
+  color: #d7d3d3e3;
+  margin: 15px 0;
+}
+
+/* SIRI STYLE CIRCLE */
+.siri {
+  width: 110px;
+  height: 110px;
+  margin: 15px auto;
+  border-radius: 50%;
+  background: radial-gradient(circle, #00ffe0, #0066ff);
+  animation: siriPulse 1.4s infinite ease-in-out;
+  box-shadow: 0 0 30px #e7f5f5;
+}
+
+@keyframes siriPulse {
+  0% { transform: scale(0.9); opacity: 0.6; }
+  50% { transform: scale(1.1); opacity: 1; }
+  100% { transform: scale(0.9); opacity: 0.6; }
+}
+
+/* WAVEFORM */
+.wave {
+  display: flex;
+  justify-content: center;
+  height: 40px;
+}
+
+.wave span {
+  width: 6px;
+  margin: 0 4px;
+  background: #00ffe0;
+  border-radius: 10px;
+  animation: wave 1s infinite;
+}
+
+.wave span:nth-child(2){animation-delay:.1s}
+.wave span:nth-child(3){animation-delay:.2s}
+.wave span:nth-child(4){animation-delay:.3s}
+.wave span:nth-child(5){animation-delay:.4s}
+
+@keyframes wave {
+  0% { height: 10px; }
+  50% { height: 35px; }
+  100% { height: 10px; }
+}
+
+/* LISTENING DOTS */
+.listening span {
+  width: 10px;
+  height: 10px;
+  background: #060a0a;
+  border-radius: 50%;
+  margin: 4px;
+  display: inline-block;
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0%,100% {opacity:.4}
+  50% {opacity:1}
+}
+
+.hidden { display: none; }
+
+/* CHAT */
+.chat-area { margin-top: 20px; }
+
+.chat {
+  padding: 12px;
+  border-radius: 15px;
+  max-width: 75%;
+  margin-bottom: 10px;
+}
+
+.chat.user {
+  background: rgba(237, 233, 233, 0.923);
+  animation: slideLeft .4s ease;
+}
+
+.chat.ai {
+  background: #d9e3e3e2;
+  margin-left: auto;
+  animation: slideRight .4s ease;
+}
+
+@keyframes slideLeft {
+  from {transform: translateX(-30px);opacity:0}
+  to {transform: translateX(0);opacity:1}
+}
+@keyframes slideRight {
+  from {transform: translateX(30px);opacity:0}
+  to {transform: translateX(0);opacity:1}
+}
+/* TEXT INPUT BAR */
+.text-input {
+  display: flex;
+  gap: 8px;
+  margin-top: 15px;
+}
+.text-input input {
+  flex: 1;
+  padding: 12px 14px;
+  border-radius: 20px;
+  border: none;
+  outline: none;
+  background: rgba(255,255,255,0.15);
+  color: rgba(24, 20, 20, 0.87);
+  font-size: 14px;
+}
+
+.text-input input::placeholder {
+  color: #160f0fd9;
+}
+
+.text-input button {
+  width: 45px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  background: linear-gradient(45deg, #dbe6e4, #00b3ff);
+  color: hwb(0 3% 96%);
+  font-size: 18px;
+  transition: 0.2s;
+}
+
+.text-input button:hover {
+  transform: scale(1.1);
+}
+
+</style>
+<script>
+  const userText = document.getElementById("userText");
+const aiText = document.getElementById("aiText");
+const userBox = document.getElementById("userBox");
+const aiBox = document.getElementById("aiBox");
+const listening = document.getElementById("listening");
+const waveform = document.getElementById("waveform");
+const siri = document.getElementById("siri");
+
+function startListening() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const recognition = new SpeechRecognition();
+
+  recognition.lang = "en-IN";
+  recognition.start();
+
+  listening.classList.remove("hidden");
+  waveform.classList.remove("hidden");
+  siri.classList.remove("hidden");
+
+  recognition.onresult = function(event) {
+    const text = event.results[0][0].transcript;
+
+    listening.classList.add("hidden");
+    waveform.classList.add("hidden");
+    siri.classList.add("hidden");
+
+    userText.innerText = text;
+    userBox.classList.remove("hidden");
+
+    fetch("/command", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({ text })
+    })
+    .then(res => res.json())
+    .then(data => {
+      aiText.innerText = data.reply;
+      aiBox.classList.remove("hidden");
+      speak(data.reply);
+    });
+  };
+
+  recognition.onerror = () => {
+    listening.classList.add("hidden");
+    waveform.classList.add("hidden");
+    siri.classList.add("hidden");
+  };
+}
+
+function speak(msg) {
+  const utter = new SpeechSynthesisUtterance(msg);
+  utter.lang = "en-IN";
+  window.speechSynthesis.speak(utter);
+}
+function sendTextCommand() {
+  const input = document.getElementById("textCommand");
+  const text = input.value.trim();
+
+  if (text === "") return;
+
+  // Show user bubble
+  userText.innerText = text;
+  userBox.classList.remove("hidden");
+
+  fetch("/command", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ text })
+  })
+  .then(res => res.json())
+  .then(data => {
+    aiText.innerText = data.reply;
+    aiBox.classList.remove("hidden");
+    speak(data.reply); // voice reply (optional)
+  });
+
+  input.value = "";
+}
+
+</script>
+
+</body>
+</html>
